@@ -7,22 +7,24 @@ from pybricks.parameters import (Port, Stop, Direction, Button, Color,
                                  SoundFile, ImageFile, Align)
 from pybricks.tools import print, wait, StopWatch
 from pybricks.robotics import DriveBase
-import grab_module as grab
 
+GRAB_DEGREE = 400
 
-grab.close_grab()
-brick.sound.beep()
-grab.open_grab()
+def open_grab():
+    grab_motor = Motor(Port.A)
+    angle = grab_motor.angle() 
+    print(angle)
+    grab_motor.run_target(500, -GRAB_DEGREE, Stop.BRAKE)
+    angle = grab_motor.angle() 
+    print(angle)
 
-line_sensor = ColorSensor(Port.S1)
-
-while not any(brick.buttons()):
-    color = line_sensor.color()
-    print(" colour:", color)
-
-    wait(100)
-
-
+def close_grab():
+    grab_motor = Motor(Port.A)
+    angle = grab_motor.angle() 
+    print(angle)
+    grab_motor.run_target(500, GRAB_DEGREE, Stop.BRAKE)
+    angle = grab_motor.angle() 
+    print(angle)
 
 
 
