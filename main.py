@@ -17,7 +17,7 @@ grab.open_grab()
 line_sensor = ColorSensor(Port.S1)
 
 while not any(brick.buttons()):
-    color = line_sensor.color()
+    color = line_sensor.
     print(" colour:", color)
 
     wait(100)
