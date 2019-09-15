@@ -9,12 +9,37 @@ from pybricks.tools import print, wait, StopWatch
 from pybricks.robotics import DriveBase
 from grabber_module import Grabber
 
-
+#Инициализация
 grabber = Grabber(Motor(Port.A))
 
-grabber.close()
-brick.sound.beep()
 grabber.open()
+
+left_wheel = Motor(Port.B)
+right_wheel = Motor(Port.C)
+front_sensor = UltrasonicSensor(Port.S1)
+
+
+TRUCK_SPEED = 500;
+left_wheel.run(TRUCK_SPEED)
+right_wheel.run(TRUCK_SPEED)
+
+while (front_sensor.distance()>40):
+    print(front_sensor.distance())
+    wait(10)
+left_wheel.stop()
+right_wheel.stop()
+grabber.close()
+
+left_wheel.run(-TRUCK_SPEED)
+right_wheel.run(-TRUCK_SPEED)
+wait(5000)
+
+left_wheel.stop()
+right_wheel.stop()
+
+grabber.open()
+
+
 brick.sound.beep()
 
 '''
