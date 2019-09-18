@@ -1,56 +1,42 @@
 #!/usr/bin/env pybricks-micropython
 
 from pybricks import ev3brick as brick
-from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
-                                 InfraredSensor, UltrasonicSensor, GyroSensor)
-from pybricks.parameters import (Port, Stop, Direction, Button, Color,
-                                 SoundFile, ImageFile, Align)
 from pybricks.tools import print, wait, StopWatch
 from pybricks.robotics import DriveBase
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor, InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import (Port, Stop, Direction, Button, Color, SoundFile, ImageFile, Align)
 from grabber_module import Grabber
+from truck_module import Truck
 
 #Инициализация
 grabber = Grabber(Motor(Port.A))
-
-grabber.open()
-
-left_wheel = Motor(Port.B)
-right_wheel = Motor(Port.C)
+truck = Truck(Motor(Port.B),Motor(Port.C))
 front_sensor = UltrasonicSensor(Port.S1)
+left_sensor = ColorSensor(Port.S2)
+right_sensor = ColorSensor(Port.S3)
 
 
-TRUCK_SPEED = 500;
-left_wheel.run(TRUCK_SPEED)
-right_wheel.run(TRUCK_SPEED)
+#Работа
 
-while (front_sensor.distance()>40):
-    print(front_sensor.distance())
-    wait(10)
-left_wheel.stop()
-right_wheel.stop()
-grabber.close()
+def takeObject:
+    grabber.open()
+    truck.run_forward()
+    while (front_sensor.distance()>40):
+        print(front_sensor.distance())
+        wait(10)
+    grabber.close()
 
-left_wheel.run(-TRUCK_SPEED)
-right_wheel.run(-TRUCK_SPEED)
+
+takeObject()
+truck.rotate180()
+truck.run_forward()
 wait(5000)
 
-left_wheel.stop()
-right_wheel.stop()
-
+truck.stop()
 grabber.open()
-
 
 brick.sound.beep()
 
-'''
-line_sensor = ColorSensor(Port.S1)
-
-while not any(brick.buttons()):
-    color = line_sensor.color()
-    print(" colour:", color)
-
-    wait(100)
-'''
 
 
 
