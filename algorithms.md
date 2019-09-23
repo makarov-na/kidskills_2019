@@ -44,3 +44,13 @@
 * Как понять, что мы в зоне 3-4
   * Наличие первого поворта на 90 градусов влево
   * Наличие второго поворота на 90 градусов влево
+
+The number given here 1020 deg/s is the theoretical maximum speed of the large EV3 motor, in reality you won’t get this much speed out of it. It will max out at 930 deg/s with no load, and 880 deg/s using the standard LEGO rover build.
+
+rive speed:  200 motor speed:  483
+drive speed:  210 motor speed:  500
+drive speed:  220 motor speed:  511
+drive speed:  230 motor speed:  520
+drive speed:  240 motor speed:  521
+drive speed:  250 motor speed:  522
+drive speed:  260 motor speed:  525
