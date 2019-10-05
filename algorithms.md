@@ -56,7 +56,6 @@
 * Разворот на 180 градусов
 * Проход Т-образного перекрестка
 
-
 The number given here 1020 deg/s is the theoretical maximum speed of the large EV3 motor, in reality you won’t get this much speed out of it. It will max out at 930 deg/s with no load, and 880 deg/s using the standard LEGO rover build.
 
 rive speed:  200 motor speed:  483

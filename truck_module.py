@@ -6,6 +6,7 @@ from pybricks.robotics import DriveBase
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor, InfraredSensor, UltrasonicSensor, GyroSensor)
 from pybricks.parameters import (Port, Stop, Direction, Button, Color, SoundFile, ImageFile, Align)
 from grabber_module import Grabber
+import math
 
 class Truck:
 
@@ -51,4 +52,31 @@ class Truck:
 
     def open_grubber(self):
         self.grabber.open()
+
+class PidRegulator:
+
+    def __init__(self, target_value, kp, kd, ki):
+        self.target_value = target_value
+        self.err = 0
+        self.diff_err = 0
+        self.integr_err = 0
+        self.prevent_err = 0
+        self.kp = kp
+        self.kd = kd
+        self.ki = ki
+
+    def get_output(self, current_value):
+        current_err = self.target_value - current_value
+        #TODO Найти более правильный способ борьбы с интегральным насыщением
+        if (math.fabs(current_err) <= 2):
+            self.integr_err = 0
+        self.integr_err = self.integr_err + current_err
+        self.diff_err = current_err - self.prevent_err
+        output_val = self.kp*current_err + self.kd*self.diff_err + self.ki*self.integr_err
+        self.prevent_err = current_err
+        print("target_value: ", self.target_value, " current_value: ", current_value, " current_err: ", current_err,
+              "prevent_err: ", self.prevent_err, " integr_err: ", self.integr_err, "diff_err: ", self.diff_err, "optput: ", output_val)
+        return output_val
+
+
 
