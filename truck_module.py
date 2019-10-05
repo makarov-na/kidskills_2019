@@ -28,7 +28,7 @@ class Truck:
         self.left_motor.run(-self.TRUCK_SPEED)
         self.right_motor.run(-self.TRUCK_SPEED)
 
-    def rotate_180(self):
+    def rotate_180_by_gyro(self):
         gyro_sensor = GyroSensor(Port.S4)
         gyro_sensor.reset_angle(0)
         self.left_motor.run(self.TRUCK_SPEED)
