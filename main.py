@@ -20,8 +20,8 @@ truck = Truck(left_wheel_motor, right_wheel_motor, grabber_motor, distance_senso
 drive_base = DriveBase(left_wheel_motor, right_wheel_motor, 43.2, 112)
 
 # Настройка PID датчика
-line_side = calibrate_line_side(left_sensor)
-pid_regulator = PidRegulator(line_side, 2, 2, 0.1)
+line_side_reflection = calibrate_line_side(left_sensor)
+pid_regulator = PidRegulator(line_side_reflection, 2, 2, 0.1)
 
 # Настройка скорости и стартовых значений тележки
 max_speed = 150
@@ -37,8 +37,11 @@ while not any(brick.buttons()):
     # Если мы на черном, то output положительный, нужно разогнать правое на максимум и тормозить левое колесо на значение output
     drive_base.drive(max_speed, steering)
 
-    #Проверить нет ли угла 90 градусов
-    #Если есть повернуть по отдельному алгоритму
+    if (right_sensor.reflection() < line_side_reflection):
+        truck.stop()
+        truck.turn_right()
+        truck.run_forward()
+        wait(1000)
 
     if (distance_sensor.distance() < 150):
         break
