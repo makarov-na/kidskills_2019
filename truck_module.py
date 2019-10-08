@@ -42,9 +42,25 @@ class Truck:
         wait(4000)
 
     def turn_right(self):
-        angle_for_90_degrees = 234
+        angle_for_90_degrees = 235
         self.left_motor.run_angle(self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, False)
         self.right_motor.run_angle(-self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, True)
+
+    def turn_left(self):
+        angle_for_90_degrees = 235
+        self.left_motor.run_angle(-self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, False)
+        self.right_motor.run_angle(self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, True)
+
+    def turn_left_180(self):
+        angle_for_180_degrees = 235*2
+        self.left_motor.run_angle(-self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, False)
+        self.right_motor.run_angle(self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, True)
+
+    def turn_right_180(self):
+        angle_for_180_degrees = 235*2
+        self.left_motor.run_angle(self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, False)
+        self.right_motor.run_angle(-self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, True)
+
 
     def take_object(self):
         self.grabber.open()
@@ -70,14 +86,15 @@ class PidRegulator:
         self.kp = kp
         self.kd = kd
         self.ki = ki
+        self.integral_value_max = 20
 
     def get_output(self, current_value):
         current_err = self.target_value - current_value
         self.integr_err = self.integr_err + current_err
-        if (self.integr_err > 0 and self.integr_err > 100):
-            self.integr_err = 100
-        if (self.integr_err < 0 and self.integr_err < -100):
-            self.integr_err = -100
+        if (self.integr_err > 0 and self.integr_err > self.integral_value_max):
+            self.integr_err = self.integral_value_max
+        if (self.integr_err < 0 and self.integr_err < - self.integral_value_max):
+            self.integr_err = -self.integral_value_max
         self.diff_err = current_err - self.prevent_err
         output_val = self.kp*current_err + self.kd*self.diff_err + self.ki*self.integr_err
         self.prevent_err = current_err

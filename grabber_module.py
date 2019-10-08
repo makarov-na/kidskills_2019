@@ -25,5 +25,6 @@ class Grabber:
         self.motor.run_until_stalled(self.GRAB_SPEED, self.GRAB_HOLD_ACTION, self.GRAB_DUTY_LIMIT)
         stop_angle = self.motor.angle()
         print("motor rotated at ", stop_angle - start_angle)
+        self.motor.stop()
 
 

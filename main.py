@@ -30,6 +30,15 @@ steering = 0
 
 wait(1000)
 
+right_angle_count = 1
+zone_1_2_right_angle_count = 1
+zone_3_4_right_angle_count = 2
+
+# Проезд от старта до финиша
+
+def is_two_sensors_on_black():
+    return (right_sensor.reflection() < line_side_reflection) and (left_sensor.reflection() < line_side_reflection + 5)
+
 while not any(brick.buttons()):
 
     steering = - pid_regulator.get_output(left_sensor.reflection())
@@ -37,14 +46,23 @@ while not any(brick.buttons()):
     # Если мы на черном, то output положительный, нужно разогнать правое на максимум и тормозить левое колесо на значение output
     drive_base.drive(max_speed, steering)
 
-    if (right_sensor.reflection() < line_side_reflection):
+    if (is_two_sensors_on_black()):
         truck.stop()
-        truck.turn_right()
+        if (right_angle_count == zone_1_2_right_angle_count):
+            truck.turn_left()
+            truck.take_object()
+            truck.turn_right_180()
+        elif (right_angle_count == zone_3_4_right_angle_count):
+            truck.turn_right()
+        else:
+            truck.run_forward()
+            wait(200)
+            break
         truck.run_forward()
-        wait(1000)
+        wait(500)
+        right_angle_count += 1
 
-    if (distance_sensor.distance() < 150):
-        break
     wait(10)
 
 brick.sound.beep()
+

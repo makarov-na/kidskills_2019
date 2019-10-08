@@ -28,11 +28,6 @@ def calibrate_line_side(sensor):
 
 
 def take_object_and_run():
-    while (True):
-        print("LR: ", left_sensor.reflection(), "RR: ", right_sensor.reflection())
-        wait(1000)
-    truck.rotate_180()
-
     truck.take_object()
     truck.rotate_180()
     truck.run_forward()
