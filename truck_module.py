@@ -18,6 +18,14 @@ class Truck:
         self.grabber = Grabber(grabber_motor)
         self.front_sensor = front_sensor
 
+    def run_forward_mm(self):
+        self.left_motor.run(self.TRUCK_SPEED)
+        self.right_motor.run(self.TRUCK_SPEED)
+
+    def run_backward_mm(self):
+        self.left_motor.run(self.TRUCK_SPEED)
+        self.right_motor.run(self.TRUCK_SPEED)
+
     def run_forward(self):
         self.left_motor.run(self.TRUCK_SPEED)
         self.right_motor.run(self.TRUCK_SPEED)
