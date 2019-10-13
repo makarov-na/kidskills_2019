@@ -11,12 +11,13 @@ import math
 
 class Truck:
 
-    def __init__(self, left_motor, right_motor, grabber_motor, front_sensor):
+    def __init__(self, left_motor, right_motor, grabber_motor, grabber_sensor, drive_base):
         self.TRUCK_SPEED = 500
         self.left_motor = left_motor
         self.right_motor = right_motor
         self.grabber = Grabber(grabber_motor)
-        self.front_sensor = front_sensor
+        self.front_sensor = grabber_sensor
+        self.drive_base = drive_base
 
     def run_forward_mm(self):
         self.left_motor.run(self.TRUCK_SPEED)
@@ -29,6 +30,12 @@ class Truck:
     def run_forward(self):
         self.left_motor.run(self.TRUCK_SPEED)
         self.right_motor.run(self.TRUCK_SPEED)
+
+    def drive(self, max_speed, steering):
+        self.drive_base.drive(max_speed, steering)
+
+    def drive_time(self, speed, steereng, time):
+        self.drive_base.drive_time(speed, steereng, time)
 
     def stop(self):
         self.left_motor.stop()
@@ -49,12 +56,12 @@ class Truck:
         self.stop()
         wait(4000)
 
-    def turn_right(self):
+    def turn_right_90(self):
         angle_for_90_degrees = 235
         self.left_motor.run_angle(self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, False)
         self.right_motor.run_angle(-self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, True)
 
-    def turn_left(self):
+    def turn_left_90(self):
         angle_for_90_degrees = 235
         self.left_motor.run_angle(-self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, False)
         self.right_motor.run_angle(self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, True)
@@ -69,7 +76,6 @@ class Truck:
         self.left_motor.run_angle(self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, False)
         self.right_motor.run_angle(-self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, True)
 
-
     def take_object(self):
         self.grabber.open()
         self.run_forward()
@@ -79,7 +85,7 @@ class Truck:
         self.stop()
         self.grabber.close()
 
-    def open_grubber(self):
+    def open_grabber(self):
         self.grabber.open()
 
 

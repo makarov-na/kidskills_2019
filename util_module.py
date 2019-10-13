@@ -2,10 +2,8 @@
 
 import sys
 
-
 def exit():
     sys.exit(0)
-
 
 def wait_start_keypress():
     brick.display.text("Line side: " + str(line_side))
@@ -13,6 +11,9 @@ def wait_start_keypress():
     while not any(brick.buttons()):
         wait(10)
 
+def on_junction_or_turn_90(main_sensor, add_sensor, line_side_reflection):
+    main_sensor_deviation = 5
+    return (add_sensor.reflection() < line_side_reflection) and (main_sensor.reflection() < line_side_reflection + main_sensor_deviation)
 
 def calibrate_line_side(sensor):
     return 30
@@ -25,12 +26,4 @@ def calibrate_line_side(sensor):
     wait(1000)
     line_side = sensor.reflection()
     return line_side
-
-
-def take_object_and_run():
-    truck.take_object()
-    truck.rotate_180()
-    truck.run_forward()
-    truck.stop()
-    truck.open_grubber()
 
