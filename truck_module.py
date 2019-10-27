@@ -100,7 +100,7 @@ class PidRegulator:
         self.kp = kp
         self.kd = kd
         self.ki = ki
-        self.integral_value_max = 20
+        self.integral_value_max = 300
 
     def get_current_error(self):
         return self.current_err
@@ -113,8 +113,8 @@ class PidRegulator:
         if (self.integr_err < 0 and self.integr_err < - self.integral_value_max):
             self.integr_err = -self.integral_value_max
         self.diff_err = self.current_err - self.prevent_err
+        if (abs(self.current_err)<19):
+            self.integr_err = 0
         output_val = self.kp*self.current_err + self.kd*self.diff_err + self.ki*self.integr_err
-        print("target_value: ", self.target_value, " current_value: ", current_value, " current_err: ", self.current_err,
-              "prevent_err: ", self.prevent_err, " integr_err: ", self.integr_err, "diff_err: ", self.diff_err, "optput: ", output_val)
         self.prevent_err = self.current_err
         return output_val

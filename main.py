@@ -27,14 +27,17 @@ white_reflection = 70
 black_reflection = 11
 max_white_reflection = line_border_reflection + (line_border_reflection - black_reflection)
 
-#35max
+# 35max
 KP = 1.5
-KD = 2
-KI = 0
+KD = 1
+KI = 0.5
 pid_regulator = PidRegulator(line_border_reflection, KP, KD, KI)
 
 # Настройка скорости и стартовых значений тележки
 max_speed = 300  # mm/sec
+min_speed = 70
+speed_delta = 10
+
 steering = 0
 steering_direction_for_left_sensor = -1
 steering_direction_for_right_sensor = 1
@@ -47,10 +50,11 @@ steering_direction_for_right_sensor = 1
 main_line_sensor = left_line_sensor
 add_line_sensor = right_line_sensor
 steering_direction = steering_direction_for_left_sensor
+speed = min_speed
 
 start_time = time.time()
-while (time.time()-start_time < 5):
-    
+while (time.time()-start_time < 20):
+
     reflection = main_line_sensor.reflection()
     # Нормализуем значение для устранения перекоса управляющего воздействия
     if reflection > max_white_reflection:
@@ -58,13 +62,30 @@ while (time.time()-start_time < 5):
 
     steering = pid_regulator.get_output(reflection) * steering_direction
 
-    speed = max_speed
+    if (abs(pid_regulator.get_current_error()) == (line_border_reflection - black_reflection)):
+        speed = speed - speed_delta
+        if speed < min_speed:
+            speed = min_speed
+    else:
+        speed = speed + speed_delta
+        if speed > max_speed:
+            speed = max_speed
+
     truck.drive(speed, steering)
+    print("TV:", pid_regulator.target_value, ";CV:", reflection, ";CERR:", pid_regulator.current_err,
+          ";PERR:", pid_regulator.prevent_err,
+          ";PV:", round(pid_regulator.current_err*pid_regulator.kp, 2),
+          ";IV:", pid_regulator.integr_err*pid_regulator.ki,
+          ";DV:", pid_regulator.diff_err*pid_regulator.kd,
+          ";SV:", steering,
+          ";SP:", speed)
 
     wait(5)
 
     if (on_junction_or_turn_90(main_line_sensor, add_line_sensor, line_border_reflection)):
         truck.stop()
+        print("###################")
+        break
 
 exit()
 
