@@ -25,6 +25,7 @@ truck = Truck(left_wheel_motor, right_wheel_motor, grabber_motor, grabber_sensor
 line_border_reflection = 30  # calibrate_line_side(left_line_sensor)
 white_reflection = 70
 black_reflection = 11
+speed_down_error = line_border_reflection - black_reflection
 max_white_reflection = line_border_reflection + (line_border_reflection - black_reflection)
 
 KP = 2
@@ -37,6 +38,7 @@ max_speed = 200  # mm/sec
 min_speed = 150
 speed_delta_down = 10
 speed_delta_up = 3
+speed = min_speed
 
 steering = 0
 steering_direction_for_left_sensor = -1
@@ -50,37 +52,41 @@ steering_direction_for_right_sensor = 1
 main_line_sensor = left_line_sensor
 add_line_sensor = right_line_sensor
 steering_direction = steering_direction_for_left_sensor
-speed = min_speed
+
+def change_speed(current_error, current_speed):
+    new_speed = current_speed
+    if (abs(current_error) >= (speed_down_error)):
+        new_speed = current_speed - speed_delta_down
+        if (new_speed < min_speed):
+            new_speed = min_speed
+    else:
+        new_speed = current_speed + speed_delta_up
+        if (new_speed > max_speed):
+            new_speed = max_speed
+    return new_speed
+
+
 
 start_time = time.time()
 while (time.time()-start_time < 200):
 
     reflection = main_line_sensor.reflection()
     # Нормализуем значение для устранения перекоса управляющего воздействия
-    #if reflection > max_white_reflection:
+    # if reflection > max_white_reflection:
     #    reflection = max_white_reflection
 
     steering = pid_regulator.get_output(reflection) * steering_direction
-
-    speed = 
-    if (abs(pid_regulator.get_current_error()) == (line_border_reflection - black_reflection)):
-        speed = speed - speed_delta_down
-        if speed < min_speed:
-            speed = min_speed
-    else:
-        speed = speed + speed_delta_up
-        if speed > max_speed:
-            speed = max_speed
-
+    speed = change_speed(pid_regulator.get_current_error(), speed)
     truck.drive(speed, steering)
+
     print("TV:", pid_regulator.target_value,
           ";CV:", reflection,
           ";CERR:", pid_regulator.current_err,
           ";PERR:", pid_regulator.prevent_err,
-          ";PV:", round(pid_regulator.current_err*pid_regulator.kp, 2),
-          ";IV:", round(pid_regulator.integr_err*pid_regulator.ki, 2),
-          ";DV:", round(pid_regulator.diff_err*pid_regulator.kd, 2),
-          ";SV:", round(steering * steering_direction, 2),
+          ";PV:", pid_regulator.current_err*pid_regulator.kp,
+          ";IV:", pid_regulator.integr_err*pid_regulator.ki,
+          ";DV:", pid_regulator.diff_err*pid_regulator.kd,
+          ";SV:", steering * steering_direction,
           ";SP:", speed)
 
     wait(10)
@@ -103,6 +109,7 @@ while not any(brick.buttons()):
 
     # Вычисляем управляющее воздействие для следования по линии и передаем его на вход тележки
     steering = pid_regulator.get_output(main_line_sensor.reflection()) * steering_direction
+    speed = change_speed(pid_regulator.get_current_error(), speed)
     truck.drive(max_speed, steering)
 
     # Отдельный алгоритм для прохода пряых углов и зон с объектами при проходе против часовой стрелки
@@ -134,16 +141,12 @@ zone_3_4_right_angle = 2
 main_line_sensor = left_line_sensor
 add_line_sensor = right_line_sensor
 steering_direction = steering_direction_for_left_sensor
-KSPEED = 0.1
-KBLACK = 1.5
 
 while not any(brick.buttons()):
 
     # Вычисляем управляющее воздействие для следования по линии и передаем его на вход тележки
     steering = pid_regulator.get_output(main_line_sensor.reflection()) * steering_direction
-    if (steering < 0):
-        steering = steering * KBLACK
-    speed = max_speed * (1 - abs(steering) * KSPEED)
+    speed = change_speed(pid_regulator.get_current_error(), speed)
     truck.drive(speed, steering)
 
     # Отдельный алгоритм для прохода пряых углов и зон с объектами при проходе по часовой стрелке
