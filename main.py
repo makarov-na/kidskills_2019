@@ -27,16 +27,16 @@ white_reflection = 70
 black_reflection = 11
 max_white_reflection = line_border_reflection + (line_border_reflection - black_reflection)
 
-# 35max
-KP = 1.5
-KD = 1
-KI = 0.5
+KP = 2
+KD = 2
+KI = 0.1
 pid_regulator = PidRegulator(line_border_reflection, KP, KD, KI)
 
 # Настройка скорости и стартовых значений тележки
-max_speed = 300  # mm/sec
-min_speed = 70
-speed_delta = 10
+max_speed = 200  # mm/sec
+min_speed = 150
+speed_delta_down = 10
+speed_delta_up = 3
 
 steering = 0
 steering_direction_for_left_sensor = -1
@@ -53,34 +53,37 @@ steering_direction = steering_direction_for_left_sensor
 speed = min_speed
 
 start_time = time.time()
-while (time.time()-start_time < 20):
+while (time.time()-start_time < 200):
 
     reflection = main_line_sensor.reflection()
     # Нормализуем значение для устранения перекоса управляющего воздействия
-    if reflection > max_white_reflection:
-        reflection = max_white_reflection
+    #if reflection > max_white_reflection:
+    #    reflection = max_white_reflection
 
     steering = pid_regulator.get_output(reflection) * steering_direction
 
+    speed = 
     if (abs(pid_regulator.get_current_error()) == (line_border_reflection - black_reflection)):
-        speed = speed - speed_delta
+        speed = speed - speed_delta_down
         if speed < min_speed:
             speed = min_speed
     else:
-        speed = speed + speed_delta
+        speed = speed + speed_delta_up
         if speed > max_speed:
             speed = max_speed
 
     truck.drive(speed, steering)
-    print("TV:", pid_regulator.target_value, ";CV:", reflection, ";CERR:", pid_regulator.current_err,
+    print("TV:", pid_regulator.target_value,
+          ";CV:", reflection,
+          ";CERR:", pid_regulator.current_err,
           ";PERR:", pid_regulator.prevent_err,
           ";PV:", round(pid_regulator.current_err*pid_regulator.kp, 2),
-          ";IV:", pid_regulator.integr_err*pid_regulator.ki,
-          ";DV:", pid_regulator.diff_err*pid_regulator.kd,
-          ";SV:", steering,
+          ";IV:", round(pid_regulator.integr_err*pid_regulator.ki, 2),
+          ";DV:", round(pid_regulator.diff_err*pid_regulator.kd, 2),
+          ";SV:", round(steering * steering_direction, 2),
           ";SP:", speed)
 
-    wait(5)
+    wait(10)
 
     if (on_junction_or_turn_90(main_line_sensor, add_line_sensor, line_border_reflection)):
         truck.stop()
