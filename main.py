@@ -1,5 +1,8 @@
 #!/usr/bin/env pybricks-micropython
 
+from util_module import *
+import csv
+import math
 from pybricks import ev3brick as brick
 from pybricks.tools import print, wait, StopWatch
 from pybricks.robotics import DriveBase
@@ -44,7 +47,7 @@ steering = 0
 steering_direction_for_left_sensor = -1
 steering_direction_for_right_sensor = 1
 
-
+metrics_data = []
 # Пауза перед началом работы
 # wait(1000)
 
@@ -79,6 +82,18 @@ while (time.time()-start_time < 200):
     speed = change_speed(pid_regulator.get_current_error(), speed)
     truck.drive(speed, steering)
 
+
+    #metrics_data.append([time, error, sum_out, p_out, d_out, i_out, motor_a_speed, motor_b_speed])
+    time = current_milli_time()
+    error = pid_regulator.current_err
+    sum_out = steering
+    p_out = pid_regulator.current_err*pid_regulator.k
+    i_out = pid_regulator.integr_err*pid_regulator.ki
+    d_out = pid_regulator.diff_err*pid_regulator.kd
+    motor_a_speed = 0
+    motor_b_speed = 0
+    metrics_data.append([time, error, sum_out, p_out, d_out, i_out, motor_a_speed, motor_b_speed])
+
     print("TV:", pid_regulator.target_value,
           ";CV:", reflection,
           ";CERR:", pid_regulator.current_err,
@@ -96,6 +111,7 @@ while (time.time()-start_time < 200):
         print("###################")
         break
 
+write_metrics_to_file(metrics_data)
 exit()
 
 # Проезд по короткому пути от старта до объекта в зоне 3, возврат на базу и выход на второй круг
