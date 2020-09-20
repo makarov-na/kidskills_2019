@@ -9,12 +9,6 @@ def current_milli_time():
 def exit():
     sys.exit(0)
 
-def write_metrics_to_file(data):
-    with open('pid.csv', mode='w') as pid_out_file:
-        for row_data in data:
-            pid_out_file.write(','.join(map(str, row_data))  + "\n")
-
-
 def wait_start_keypress():
     brick.display.text("Line side: " + str(line_side))
     brick.display.text("Press any key to start")

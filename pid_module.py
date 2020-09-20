@@ -12,6 +12,8 @@ class PidRegulator:
         self.ki = ki
         self.integral_value_max = 20
 
+        self.last_output = 0
+
     def get_current_error(self):
         return self.current_err
 
@@ -28,5 +30,6 @@ class PidRegulator:
         # if (abs(self.current_err) == 19 and abs(self.prevent_err) == 19):
         #    self.diff_err = self.current_err
         output_val = self.kp*self.current_err + self.kd*self.diff_err + self.ki*self.integr_err
+        self.last_output = output_val
         self.prevent_err = self.current_err
         return output_val
