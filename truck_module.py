@@ -11,25 +11,26 @@ import math
 
 class Truck:
 
-    def __init__(self, left_motor, right_motor, grabber_motor, grabber_sensor, drive_base):
+    def __init__(self):
         self.TRUCK_SPEED = 500
-        self.left_motor = left_motor
-        self.right_motor = right_motor
-        self.grabber = Grabber(grabber_motor)
-        self.front_sensor = grabber_sensor
-        self.drive_base = drive_base
+        self.left_wheel_motor = Motor(Port.B)
+        self.right_wheel_motor = Motor(Port.C)
+        self.left_line_sensor = ColorSensor(Port.S2)
+        self.right_line_sensor = ColorSensor(Port.S3)
+        self.drive_base = DriveBase(self.left_wheel_motor, self.right_wheel_motor, 43.2, 112)
+
 
     def run_forward_mm(self):
-        self.left_motor.run(self.TRUCK_SPEED)
-        self.right_motor.run(self.TRUCK_SPEED)
+        self.left_wheel_motor.run(self.TRUCK_SPEED)
+        self.right_wheel_motor.run(self.TRUCK_SPEED)
 
     def run_backward_mm(self):
-        self.left_motor.run(self.TRUCK_SPEED)
-        self.right_motor.run(self.TRUCK_SPEED)
+        self.left_wheel_motor.run(self.TRUCK_SPEED)
+        self.right_wheel_motor.run(self.TRUCK_SPEED)
 
     def run_forward(self):
-        self.left_motor.run(self.TRUCK_SPEED)
-        self.right_motor.run(self.TRUCK_SPEED)
+        self.left_wheel_motor.run(self.TRUCK_SPEED)
+        self.right_wheel_motor.run(self.TRUCK_SPEED)
 
     def drive(self, max_speed, steering):
         self.drive_base.drive(max_speed, steering)
@@ -38,18 +39,19 @@ class Truck:
         self.drive_base.drive_time(speed, steereng, time)
 
     def stop(self):
-        self.left_motor.stop()
-        self.right_motor.stop()
+        self.drive_base.stop()
+        self.left_wheel_motor.stop()
+        self.right_wheel_motor.stop()
 
     def run_backward(self):
-        self.left_motor.run(-self.TRUCK_SPEED)
-        self.right_motor.run(-self.TRUCK_SPEED)
+        self.left_wheel_motor.run(-self.TRUCK_SPEED)
+        self.right_wheel_motor.run(-self.TRUCK_SPEED)
 
     def rotate_180_by_gyro(self):
         gyro_sensor = GyroSensor(Port.S4)
         gyro_sensor.reset_angle(0)
-        self.left_motor.run(self.TRUCK_SPEED)
-        self.right_motor.run(-self.TRUCK_SPEED)
+        self.left_wheel_motor.run(self.TRUCK_SPEED)
+        self.right_wheel_motor.run(-self.TRUCK_SPEED)
         while (gyro_sensor.angle() < 135):
             print("Angle: ", gyro_sensor.angle())
             wait(1)
@@ -58,23 +60,23 @@ class Truck:
 
     def turn_right_90(self):
         angle_for_90_degrees = 235
-        self.left_motor.run_angle(self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, False)
-        self.right_motor.run_angle(-self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, True)
+        self.left_wheel_motor.run_angle(self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, False)
+        self.right_wheel_motor.run_angle(-self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, True)
 
     def turn_left_90(self):
         angle_for_90_degrees = 235
-        self.left_motor.run_angle(-self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, False)
-        self.right_motor.run_angle(self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, True)
+        self.left_wheel_motor.run_angle(-self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, False)
+        self.right_wheel_motor.run_angle(self.TRUCK_SPEED, angle_for_90_degrees, Stop.COAST, True)
 
     def turn_left_180(self):
         angle_for_180_degrees = 235*2
-        self.left_motor.run_angle(-self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, False)
-        self.right_motor.run_angle(self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, True)
+        self.left_wheel_motor.run_angle(-self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, False)
+        self.right_wheel_motor.run_angle(self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, True)
 
     def turn_right_180(self):
         angle_for_180_degrees = 235*2
-        self.left_motor.run_angle(self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, False)
-        self.right_motor.run_angle(-self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, True)
+        self.left_wheel_motor.run_angle(self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, False)
+        self.right_wheel_motor.run_angle(-self.TRUCK_SPEED, angle_for_180_degrees, Stop.COAST, True)
 
     def take_object(self):
         self.grabber.open()
@@ -87,36 +89,3 @@ class Truck:
 
     def open_grabber(self):
         self.grabber.open()
-
-
-class PidRegulator:
-
-    def __init__(self, target_value, kp, kd, ki):
-        self.target_value = target_value
-        self.err = 0
-        self.diff_err = 0
-        self.integr_err = 0
-        self.prevent_err = 0
-        self.kp = kp
-        self.kd = kd
-        self.ki = ki
-        self.integral_value_max = 20
-
-    def get_current_error(self):
-        return self.current_err
-
-    def get_output(self, current_value):
-        self.current_err = self.target_value - current_value
-        self.integr_err = self.integr_err + self.current_err
-        if (self.integr_err > 0 and self.integr_err > self.integral_value_max):
-            self.integr_err = self.integral_value_max
-        if (self.integr_err < 0 and self.integr_err < - self.integral_value_max):
-            self.integr_err = -self.integral_value_max
-        self.diff_err = self.current_err - self.prevent_err
-        # if (abs(self.current_err) < 19):
-        #    self.integr_err = 0
-        # if (abs(self.current_err) == 19 and abs(self.prevent_err) == 19):
-        #    self.diff_err = self.current_err
-        output_val = self.kp*self.current_err + self.kd*self.diff_err + self.ki*self.integr_err
-        self.prevent_err = self.current_err
-        return output_val
