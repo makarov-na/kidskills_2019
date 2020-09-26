@@ -14,22 +14,23 @@ class PidRegulator:
 
         self.last_output = 0
 
-    def get_current_error(self):
-        return self.current_err
+    def get_error(self):
+        return self.err
 
     def get_output(self, current_value):
-        self.current_err = self.target_value - current_value
-        self.integr_err = self.integr_err + self.current_err
+        self.input = current_value
+        self.err = self.target_value - current_value
+        self.integr_err = self.integr_err + self.err
         if (self.integr_err > 0 and self.integr_err > self.integral_value_max):
             self.integr_err = self.integral_value_max
         if (self.integr_err < 0 and self.integr_err < - self.integral_value_max):
             self.integr_err = -self.integral_value_max
-        self.diff_err = self.current_err - self.prevent_err
-        # if (abs(self.current_err) < 19):
+        self.diff_err = self.err - self.prevent_err
+        # if (abs(self.err) < 19):
         #    self.integr_err = 0
-        # if (abs(self.current_err) == 19 and abs(self.prevent_err) == 19):
-        #    self.diff_err = self.current_err
-        output_val = self.kp*self.current_err + self.kd*self.diff_err + self.ki*self.integr_err
-        self.last_output = output_val
-        self.prevent_err = self.current_err
+        # if (abs(self.err) == 19 and abs(self.prevent_err) == 19):
+        #    self.diff_err = self.err
+        output_val = self.kp*self.err + self.kd*self.diff_err + self.ki*self.integr_err
+        self.output = output_val
+        self.prevent_err = self.err
         return output_val

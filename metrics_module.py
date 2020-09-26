@@ -8,17 +8,18 @@ class Metrics:
         self.pid_regulator = pid_regulator
         self.truck = truck
 
-    def append_metrics_item(self, row_data):
+    def append_metrics_item(self, row_data = []):
         #[curr_time, error, sum_out, p_out, d_out, i_out, motor_a_speed, motor_b_speed, reflection]
         self.metric_count += 1
-        error = self.pid_regulator.current_err
+        input = self.pid_regulator.input
+        error = self.pid_regulator.err
         sum_out = self.pid_regulator.last_output
-        p_out = self.pid_regulator.current_err*self.pid_regulator.kp
+        p_out = self.pid_regulator.err*self.pid_regulator.kp
         i_out = self.pid_regulator.integr_err*self.pid_regulator.ki
         d_out = self.pid_regulator.diff_err*self.pid_regulator.kd
         motor_a_speed = self.truck.left_wheel_motor.speed()
         motor_b_speed = self.truck.right_wheel_motor.speed()
-        self.metrics_data.append([self.metric_count, error, sum_out, p_out, d_out, i_out, motor_a_speed, motor_b_speed] + row_data)
+        self.metrics_data.append([self.metric_count, error, sum_out, p_out, d_out, i_out, motor_a_speed, motor_b_speed, input] + row_data)
 
 
 

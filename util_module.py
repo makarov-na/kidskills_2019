@@ -15,9 +15,6 @@ def wait_start_keypress():
     while not any(brick.buttons()):
         wait(10)
 
-def on_junction_or_turn_90(main_sensor, add_sensor, line_side_reflection):
-    main_sensor_deviation = 5
-    return (add_sensor.reflection() < line_side_reflection) and (main_sensor.reflection() < line_side_reflection + main_sensor_deviation)
 
 def calibrate_line_side(sensor):
     brick.display.clear()
